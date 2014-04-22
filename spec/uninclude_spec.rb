@@ -5,6 +5,10 @@ module ExampleMod
   def mod; :mod; end
 end
 
+module MobMod
+  def mob; :mob; end
+end
+
 describe Uninclude do
   let(:klass) {
     Class.new do
@@ -18,6 +22,14 @@ describe Uninclude do
       instance.should respond_to(:mod)
       klass.class_eval { uninclude ExampleMod }
       instance.should_not respond_to(:mod)
+    end
+
+    it 'should uninclude module even if there is another module included' do
+      klass.class_eval { include ExampleMod; include MobMod }
+      instance.should respond_to(:mod)
+      klass.class_eval { uninclude ExampleMod }
+      instance.should_not respond_to(:mod)
+      instance.should respond_to(:mob)
     end
 
     it 'should not infinite loop' do
