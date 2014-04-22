@@ -4,15 +4,21 @@
 #define RCLASS_M_TBL(c) (RCLASS(c)->m_tbl)
 #endif
 
+#ifndef RUBY_BACKWARD_CLASSEXT_H
+static VALUE rb_class_get_superclass(VALUE klass) {
+    return RCLASS_SUPER(klass);
+}
+#endif
+
 static void uninclude(VALUE klass, VALUE mod) {
   Check_Type(mod, T_MODULE);
 
-  VALUE superklass = RCLASS_SUPER(klass);
+  VALUE superklass = rb_class_get_superclass(klass);
   VALUE lastklass = 0;
-  for(; superklass; klass = superklass, klass = RCLASS_SUPER(klass)) {
+  for(; superklass; klass = superklass, klass = rb_class_get_superclass(klass)) {
     if(lastklass == klass) break;
     if(klass == mod || RCLASS_M_TBL(superklass) == RCLASS_M_TBL(mod)) {
-      RCLASS_SUPER(klass) = RCLASS_SUPER(superklass);
+      rb_class_get_superclass(klass) = rb_class_get_superclass(superklass);
       rb_clear_cache_by_class(klass);
       break;
     }
