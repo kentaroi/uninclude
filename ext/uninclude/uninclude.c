@@ -1,6 +1,6 @@
 #include <ruby.h>
 
-#ifdef HAVE_RUBY_BACKWARD_CLASSEXT_H
+#ifndef RCLASS_EXT
 #include <ruby/backward/classext.h>
 #endif
 
