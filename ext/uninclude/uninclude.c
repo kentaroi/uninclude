@@ -1,5 +1,9 @@
 #include <ruby.h>
 
+#ifdef HAVE_RUBY_BACKWARD_CLASSEXT_H
+#include <ruby/backward/classext.h>
+#endif
+
 #ifndef RCLASS_M_TBL
 #define RCLASS_M_TBL(c) (RCLASS(c)->m_tbl)
 #endif
