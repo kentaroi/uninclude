@@ -4,26 +4,27 @@
 #include <ruby/backward/classext.h>
 #endif
 
-#ifdef RUBY_2_1_x
-#define RMODULE_IDENTIFIER(c) (RCLASS(c)->m_tbl_wrapper)
-#else
-#define RMODULE_IDENTIFIER(c) (RCLASS(c)->m_tbl)
-#endif
-
-#ifdef RUBY_2_1_x
-#define UNINCLUDE_CLEAR_METHOD_CACHE(c) (rb_clear_method_cache_by_class(c))
-#else
-#define UNINCLUDE_CLEAR_METHOD_CACHE(c) (rb_clear_cache_by_class(c))
-#endif
-
 static void uninclude(VALUE klass, VALUE mod) {
   Check_Type(mod, T_MODULE);
 
+#ifdef RCLASS_IV_TBL
+  VALUE orig = klass;
+#endif
   VALUE superklass = RCLASS_SUPER(klass);
   for(; superklass; klass = superklass, superklass = RCLASS_SUPER(klass)) {
-    if(RMODULE_IDENTIFIER(superklass) == RMODULE_IDENTIFIER(mod)) {
+#ifdef RUBY_2_1_x
+    if (RCLASS(superklass)->m_tbl_wrapper == RCLASS(mod)->m_tbl_wrapper) {
+#else
+    if (RCLASS(superklass)->m_tbl == RCLASS(mod)->m_tbl) {
+#endif
       RCLASS_SUPER(klass) = RCLASS_SUPER(superklass);
-      UNINCLUDE_CLEAR_METHOD_CACHE(klass);
+#ifdef RUBY_2_1_x
+      rb_clear_method_cache_by_class(klass);
+#elif defined RCLASS_IV_TBL
+      rb_clear_cache_by_class(orig);
+#else
+      rb_clear_cache_by_class(klass);
+#endif
       break;
     }
   };
