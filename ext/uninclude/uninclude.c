@@ -1,6 +1,6 @@
 #include <ruby.h>
 
-#ifndef RCLASS_EXT
+#ifndef RCLASS_IV_TBL
 #include <ruby/backward/classext.h>
 #endif
 
